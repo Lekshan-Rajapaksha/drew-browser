@@ -1,0 +1,15 @@
+PackageIdentifier: com.ardia.Ardia
+PackageVersion: 0.2.46
+Platform:
+  - Windows.Desktop
+InstallModes:
+  - interactive
+  - silent
+Installers:
+  - Architecture: x64
+    InstallerType: nullsoft
+    InstallerUrl: https://github.com/mantrakp04/ardia/releases/download/v0.2.46-windows/Ardia-Setup.exe
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+ManifestType: installer
+ManifestVersion: 1.6.0
+

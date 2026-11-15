@@ -1,0 +1,12 @@
+source_set("ardiacore_linux") {
+  sources = [
+    "ac_window_host_linux.cc",
+    "ac_window_host_linux.h",
+    "ac_keychain_linux.cc",
+    "ac_keychain_linux.h",
+  ]
+  deps = [
+    "//base",
+  ]
+}
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.ardia.Ardia</id>
+  <name>Ardia</name>
+  <summary>Arc's sidebar and Dia's polish on real Chromium</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0</project_license>
+  <url type="homepage">https://ardia.dev</url>
+  <description>
+    <p>
+      Ardia is a modern web browser featuring a vertical sidebar, spaces, profiles,
+      and native Chromium web compatibility without Google tracking.
+    </p>
+  </description>
+  <provides>
+    <binary>ardia</binary>
+  </provides>
+</component>
+

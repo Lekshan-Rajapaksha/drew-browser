@@ -1,0 +1,16 @@
+source_set("ardiacore_windows") {
+  sources = [
+    "ac_window_host_win.cc",
+    "ac_window_host_win.h",
+    "ac_keychain_win.cc",
+    "ac_keychain_win.h",
+  ]
+  deps = [
+    "//base",
+  ]
+  libs = [
+    "Advapi32.lib",
+    "Crypt32.lib",
+  ]
+}
+

@@ -1,0 +1,16 @@
+PackageIdentifier: com.ardia.Ardia
+PackageVersion: 0.2.46
+PackageLocale: en-US
+Publisher: Ardia Browser Authors
+PublisherUrl: https://ardia.dev
+PackageName: Ardia
+License: GPL-3.0
+ShortDescription: Arc sidebar and Dia polish on real Chromium
+Tags:
+  - browser
+  - chromium
+  - arc
+  - dia
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0
+

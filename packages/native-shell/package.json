@@ -1,0 +1,15 @@
+{
+  "name": "@ardia/native-shell",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Platform-switched native shell: macOS/Windows/Linux window chrome, menus, shortcuts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  }
+}

@@ -1,0 +1,9 @@
+PackageIdentifier: com.ardia.Ardia
+PackageVersion: 0.2.46
+PackageName: Ardia
+Publisher: Ardia Browser Authors
+License: GPL-3.0
+ManifestType: version
+ManifestVersion: 1.6.0
+DefaultLocale: en-US
+

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Ardia
+Comment=Arc sidebar and Dia polish on real Chromium
+Exec=ardia %U
+Terminal=false
+Type=Application
+Icon=ardia
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ardia;
+StartupNotify=true
+
