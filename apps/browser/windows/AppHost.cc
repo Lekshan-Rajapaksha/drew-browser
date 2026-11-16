@@ -34,7 +34,7 @@ class ArdiaWindowHostWin {
     wc.hInstance = instance;
     wc.lpszClassName = CLASS_NAME;
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground = CreateSolidColorBrush(RGB(24, 24, 27));
+    wc.hbrBackground = CreateSolidBrush(RGB(24, 24, 27));
 
     if (!RegisterClassExW(&wc)) {
       return false;
@@ -85,7 +85,7 @@ class ArdiaWindowHostWin {
       case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
-        HBRUSH brush = CreateSolidColorBrush(RGB(24, 24, 27));
+        HBRUSH brush = CreateSolidBrush(RGB(24, 24, 27));
         FillRect(hdc, &ps.rcPaint, brush);
         DeleteObject(brush);
         EndPaint(hwnd, &ps);
