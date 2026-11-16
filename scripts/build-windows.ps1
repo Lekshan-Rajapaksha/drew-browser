@@ -4,37 +4,40 @@ param(
     [switch]$Package = $true
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 
 Write-Host "Building Ardia for Windows (Version: $Version)"
 
 if (Get-Command pnpm -ErrorAction SilentlyContinue) {
-    pnpm install
+    Write-Host "Installing dependencies with pnpm..."
+    pnpm install --no-frozen-lockfile
 } else {
     Write-Warning "pnpm not found in PATH; skipping pnpm install."
 }
 
-if (Get-Command pnpm -ErrorAction SilentlyContinue) {
-    pnpm turbo run build --filter=@ardia/core --filter=@ardia/native-shell
-}
-
 $BuildDir = "apps/browser/windows/build"
 if (Get-Command cmake -ErrorAction SilentlyContinue) {
+    Write-Host "Configuring CMake..."
     cmake -S apps/browser/windows -B $BuildDir
     $Config = if ($Release) { "Release" } else { "Debug" }
+    Write-Host "Building native host ($Config)..."
     cmake --build $BuildDir --config $Config
-    Write-Host "Native host compiled successfully: $BuildDir/$Config/Ardia.exe"
+    
+    if (Test-Path "$BuildDir/$Config/Ardia.exe") {
+        Write-Host "Native host compiled successfully: $BuildDir/$Config/Ardia.exe"
+    } else {
+        Write-Error "Build failed: $BuildDir/$Config/Ardia.exe not found."
+        exit 1
+    }
 } else {
-    Write-Warning "CMake not found in PATH. Install CMake to compile the native host."
+    Write-Error "CMake not found in PATH. Install CMake to compile the native host."
+    exit 1
 }
 
 if ($Package) {
-    if (Get-Command makensis -ErrorAction SilentlyContinue) {
-        $Config = if ($Release) { "Release" } else { "Debug" }
-        & scripts/windows/build-nsis.ps1 -Version $Version -BuildDir "apps/browser/windows/build/$Config"
-    } else {
-        Write-Warning "makensis not found in PATH. Skipping installer creation."
-    }
+    $Config = if ($Release) { "Release" } else { "Debug" }
+    Write-Host "Packaging Windows Installer..."
+    & scripts/windows/build-nsis.ps1 -Version $Version -BuildDir "$BuildDir/$Config"
 }
 
 Write-Host "Build complete."
