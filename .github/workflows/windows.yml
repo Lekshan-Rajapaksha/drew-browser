@@ -17,31 +17,44 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Install NSIS (Installer Creator)
-        shell: pwsh
-        run: |
-          choco install nsis -y
-          echo "C:\Program Files (x86)\NSIS" >> $env:GITHUB_PATH
-
       - name: Setup CMake
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '3.28'
 
-      - name: Build Windows Application & Installer
+      - name: Install NSIS
+        run: choco install nsis -y
+
+      - name: Configure CMake
+        run: cmake -S apps/browser/windows -B apps/browser/windows/build
+
+      - name: Build Ardia.exe
+        run: cmake --build apps/browser/windows/build --config Release
+
+      - name: Verify Ardia.exe was created
         shell: pwsh
         run: |
-          .\scripts\build-windows.ps1 -Release -Package
+          $exe = "apps/browser/windows/build/Release/Ardia.exe"
+          if (-not (Test-Path $exe)) {
+            Write-Error "Build failed: $exe not found!"
+            exit 1
+          }
+          Write-Host "Ardia.exe built successfully."
 
-      - name: Upload Windows Executable & Installer Artifacts
+      - name: Create installer with NSIS
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/windows | Out-Null
+          $buildDir = (Resolve-Path "apps/browser/windows/build/Release").Path
+          $outFile  = (Resolve-Path ".").Path + "\dist\windows\Ardia-Setup.exe"
+          $nsi      = (Resolve-Path "scripts/windows/ardia-setup.nsi").Path
+          & "C:\Program Files (x86)\NSIS\makensis.exe" `
+            "/DPRODUCT_VERSION=0.2.46" `
+            "/DBUILD_DIR=$buildDir" `
+            "/DOUT_FILE=$outFile" `
+            $nsi
+
+      - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
           name: 72-Browser-Windows
