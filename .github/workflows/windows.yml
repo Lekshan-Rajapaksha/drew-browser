@@ -26,7 +26,7 @@ jobs:
         run: choco install nsis -y
 
       - name: Configure CMake
-        run: cmake -S apps/browser/windows -B apps/browser/windows/build
+        run: cmake -S apps/browser/windows -B apps/browser/windows/build -G "Visual Studio 17 2022" -A x64
 
       - name: Build Ardia.exe
         run: cmake --build apps/browser/windows/build --config Release
