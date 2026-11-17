@@ -25,6 +25,7 @@ function createWindow() {
     minHeight: 460,
     title: "Ardia",
     backgroundColor: "#18181b",
+    show: process.env.ARDIA_BACKGROUND !== "1",
     titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "default",
     webPreferences: {
       nodeIntegration: false,
@@ -34,16 +35,41 @@ function createWindow() {
     ...(process.platform === "win32" && {
       icon: path.join(__dirname, "../assets/icon.png"),
     }),
-    ...(process.platform === "darwin" && {
-      icon: path.join(__dirname, "../assets/icon.icns"),
-    }),
   });
 
-  win.loadURL("ardia://app/index.html");
+  win.webContents.on("did-fail-load", (_event, code, description, url) => console.error("load failed", { code, description, url }));
+  win.webContents.on("render-process-gone", (_event, details) => console.error("renderer stopped", details));
+  if (process.env.ARDIA_SMOKE === "1") {
+    const timeout = setTimeout(() => {
+      console.error("render smoke test timed out");
+      app.exit(1);
+    }, 30000);
+    win.webContents.once("did-finish-load", async () => {
+      try {
+        const rendered = await win.webContents.executeJavaScript("document.querySelector(\"#root\")?.childElementCount === 1 && document.body.innerText.length > 0");
+        if (!rendered) throw new Error("browser UI did not render");
+        clearTimeout(timeout);
+        console.log("render smoke test passed");
+        app.exit(0);
+      } catch (error) {
+        clearTimeout(timeout);
+        console.error("render smoke test failed", error);
+        app.exit(1);
+      }
+    });
+  }
+  win.loadURL("ardia://app/index.html").catch((error) => console.error("startup failed", error));
 
   win.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
+    const scheme = new URL(url).protocol;
+    if (scheme === "https:" || scheme === "http:") shell.openExternal(url);
     return { action: "deny" };
+  });
+  win.webContents.on("will-navigate", (event, url) => {
+    if (url.startsWith("ardia://app/")) return;
+    event.preventDefault();
+    const scheme = new URL(url).protocol;
+    if (scheme === "https:" || scheme === "http:") shell.openExternal(url);
   });
 }
 

@@ -15,14 +15,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      # ── Step 1: Build the web UI (Vite / pnpm monorepo) ──────────────────
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -34,7 +33,6 @@ jobs:
         working-directory: packages/demo
         run: pnpm build
 
-      # ── Step 2: Copy web build into the Electron app ─────────────────────
       - name: Copy web build into Electron app
         shell: pwsh
         run: |
@@ -44,10 +42,16 @@ jobs:
           Copy-Item $src $dst -Recurse
           Write-Host "Web build copied to $dst"
 
-      # ── Step 3: Install Electron deps and package ─────────────────────────
       - name: Install Electron app dependencies
         working-directory: apps/desktop
-        run: npm install
+        run: npm ci
+
+      - name: Verify Windows app renders
+        working-directory: apps/desktop
+        run: npm run dev
+        env:
+          ARDIA_BACKGROUND: 1
+          ARDIA_SMOKE: 1
 
       - name: Build Windows installer
         working-directory: apps/desktop
@@ -55,9 +59,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ── Step 4: Upload ────────────────────────────────────────────────────
       - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Ardia-Windows
           path: |
