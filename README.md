@@ -39,6 +39,7 @@ Drew is a modern desktop browser with an edge-to-edge interface that keeps tabs,
 - Edge-to-edge desktop interface without a second fake window.
 - Sidebar navigation, pinned sites, tab groups and profile spaces.
 - Familiar Windows keyboard shortcuts using Ctrl.
+- Auto-hiding sidebar and touchpad swipe navigation.
 - Split views for working with multiple pages.
 - Built-in history, bookmarks, downloads and settings.
 - Dark, polished interface with the Drew visual identity.
@@ -58,6 +59,18 @@ Drew is a modern desktop browser with an edge-to-edge interface that keeps tabs,
 | Previous tab | `Ctrl+Shift+Tab` |
 | Select tab | `Ctrl+1` through `Ctrl+9` |
 | Toggle sidebar | `Ctrl+S` |
+| Open settings | `Ctrl+,` |
+
+## Data storage on Windows
+
+| Data | Location |
+| --- | --- |
+| Drew application | `%LOCALAPPDATA%\Programs\Drew` by default |
+| Website sessions, cookies and cache | `%APPDATA%\Drew` |
+| Profile website data | `%APPDATA%\Drew\Partitions\drew-<profile>` |
+| Downloaded files | `%USERPROFILE%\Downloads` unless another location is selected |
+
+Each Drew profile uses a separate persistent Chromium partition. Uninstalling Drew can leave the profile folder in `%APPDATA%\Drew`; removing that folder resets locally stored website data.
 
 ## Build Drew
 

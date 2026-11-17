@@ -6,7 +6,8 @@ import { ARC_PEEK_OUT_MS, ARC_PEEK_SPRING } from "./tokens";
 import { backgroundInstance } from "../../state/app/appSettings";
 
 const SLIDE_MS = duration.base;
-const HIDE_DELAY_MS = 120;
+const WINDOWS = typeof navigator !== "undefined" && /Windows/.test(navigator.userAgent);
+const HIDE_DELAY_MS = WINDOWS ? 0 : 120;
 const ARC_IN = spring(ARC_PEEK_SPRING);
 const appInFront = () => backgroundInstance || AppState.currentState === "active";
 

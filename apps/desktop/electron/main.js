@@ -50,8 +50,15 @@ function createWindow() {
     title: "Drew",
     backgroundColor: "#18181b",
     show: process.env.ARDIA_BACKGROUND !== "1",
-    titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "default",
+    titleBarStyle: process.platform === "darwin" ? "hiddenInset" : process.platform === "win32" ? "hidden" : "default",
     autoHideMenuBar: true,
+    ...(process.platform === "win32" && {
+      titleBarOverlay: {
+        color: "#101114",
+        symbolColor: "#f4f4f5",
+        height: 34,
+      },
+    }),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -113,7 +120,7 @@ function createWindow() {
       await waitForRender();
     });
   }
-  win.loadURL("ardia://app/index.html").catch((error) => console.error("startup failed", error));
+  win.loadURL(`ardia://app/index.html?platform=${process.platform}`).catch((error) => console.error("startup failed", error));
 
   win.setMenuBarVisibility(false);
 

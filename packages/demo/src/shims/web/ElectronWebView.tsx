@@ -55,6 +55,31 @@ const safeOrigin = (url: string) => {
   }
 };
 
+const GESTURE_NAVIGATION = `(() => {
+  if (globalThis.__drewGestureNavigation) return;
+  const state = { distance: 0, last: 0, locked: false };
+  globalThis.__drewGestureNavigation = state;
+  addEventListener("wheel", (event) => {
+    if (event.ctrlKey || Math.abs(event.deltaX) <= Math.abs(event.deltaY) * 1.35) return;
+    const now = performance.now();
+    if (now - state.last > 180) {
+      state.distance = 0;
+      state.locked = false;
+    }
+    state.last = now;
+    if (state.locked) return;
+    state.distance -= event.deltaX;
+    if (Math.abs(state.distance) < 110) return;
+    state.locked = true;
+    if (state.distance > 0) history.back();
+    else history.forward();
+  }, { passive: true });
+  addEventListener("mouseup", (event) => {
+    if (event.button === 3) history.back();
+    else if (event.button === 4) history.forward();
+  }, true);
+})()`;
+
 const inspectGuest = (view: ElectronGuest | null, fallback: NavigationState) => {
   try {
     return { url: view?.getURL() || fallback.url, title: view?.getTitle() || fallback.title, canGoBack: view?.canGoBack() ?? false, canGoForward: view?.canGoForward() ?? false, isLoading: view?.isLoading() ?? false };
@@ -108,6 +133,7 @@ export const ElectronWebView = forwardRef<WebViewHandle, WebViewProps>(function 
         ready.current = true;
         latest.current.onReady?.();
       }
+      void view.executeJavaScript(GESTURE_NAVIGATION).catch(() => undefined);
       void view
         .executeJavaScript<string | null>('document.querySelector(\'meta[name="theme-color"]\')?.getAttribute("content") ?? null')
         .then((themeColor) => report({ themeColor, themeColorSource: themeColor ? "meta" : null }))

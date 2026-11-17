@@ -58,6 +58,38 @@ textarea:focus,
   box-shadow: none;
 }
 
+.ardia-desktop.native-windows {
+  box-sizing: border-box;
+  padding-top: 34px;
+  background: #101114;
+}
+
+.ardia-desktop.native-windows::before {
+  content: "Drew";
+  position: fixed;
+  z-index: 100000;
+  top: 0;
+  right: 138px;
+  left: 0;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding-left: 12px;
+  background: #101114;
+  color: rgba(255, 255, 255, 0.92);
+  font: 500 12px/1 "Segoe UI", system-ui, sans-serif;
+  letter-spacing: 0.1px;
+  user-select: none;
+  -webkit-app-region: drag;
+}
+
+.ardia-desktop.native-windows .ardia-window {
+  border: 0;
+  outline: 0;
+  background: #18181b;
+}
+
 .ardia-desktop.with-controls {
   flex-direction: column;
   gap: 12px;

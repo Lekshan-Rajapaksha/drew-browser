@@ -18,17 +18,18 @@ import { MenuHost } from "./shims/web/menus";
 import "./shims/web/motion/shortcuts";
 import { TrafficLights } from "./shims/web/windowChrome";
 
-installLocalSuggestions();
-setStoreBatching(unstable_batchedUpdates);
-useBrowser.getState().hydrate({ ...demoSession(), settings: demoSettings() });
-useBrowser.setState((s) => ({ history: demoHistory(s) }));
-startTabPages();
-startNativeSync();
-
 const params = new URLSearchParams(location.search);
 const embed = params.has("embed");
 const nativeDesktop = location.protocol === "ardia:";
+const windowsDesktop = nativeDesktop && params.get("platform") === "win32";
 const bare = embed || nativeDesktop || params.has("bare");
+
+installLocalSuggestions();
+setStoreBatching(unstable_batchedUpdates);
+useBrowser.getState().hydrate({ ...demoSession(), settings: { ...demoSettings(), ...(windowsDesktop ? { autoHideTabs: true } : {}) } });
+useBrowser.setState((s) => ({ history: demoHistory(s) }));
+startTabPages();
+startNativeSync();
 
 Object.assign(globalThis, {
   ardiaDemo: {
@@ -56,7 +57,11 @@ if (!embed || params.has("warm")) idle(warmOtherProfiles);
 
 function DemoWindow() {
   return (
-    <div className={embed ? "ardia-desktop embed" : nativeDesktop ? "ardia-desktop native-desktop" : bare ? "ardia-desktop" : "ardia-desktop with-controls"}>
+    <div
+      className={
+        embed ? "ardia-desktop embed" : windowsDesktop ? "ardia-desktop native-desktop native-windows" : nativeDesktop ? "ardia-desktop native-desktop" : bare ? "ardia-desktop" : "ardia-desktop with-controls"
+      }
+    >
       <div className="ardia-window">
         <WindowRoot />
         {nativeDesktop ? null : <TrafficLights />}
