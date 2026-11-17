@@ -40,22 +40,27 @@ function createWindow() {
   win.webContents.on("did-fail-load", (_event, code, description, url) => console.error("load failed", { code, description, url }));
   win.webContents.on("render-process-gone", (_event, details) => console.error("renderer stopped", details));
   if (process.env.ARDIA_SMOKE === "1") {
+    let lastError;
     const timeout = setTimeout(() => {
-      console.error("render smoke test timed out");
+      console.error("render smoke test timed out", lastError);
       app.exit(1);
     }, 30000);
     win.webContents.once("did-finish-load", async () => {
-      try {
-        const rendered = await win.webContents.executeJavaScript("document.querySelector(\"#root\")?.childElementCount === 1 && document.body.innerText.length > 0");
-        if (!rendered) throw new Error("browser UI did not render");
-        clearTimeout(timeout);
-        console.log("render smoke test passed");
-        app.exit(0);
-      } catch (error) {
-        clearTimeout(timeout);
-        console.error("render smoke test failed", error);
-        app.exit(1);
-      }
+      const waitForRender = async () => {
+        try {
+          const rendered = await win.webContents.executeJavaScript("document.querySelector(\"#root\")?.childElementCount === 1 && document.body.innerText.length > 0");
+          if (rendered) {
+            clearTimeout(timeout);
+            console.log("render smoke test passed");
+            app.exit(0);
+            return;
+          }
+        } catch (error) {
+          lastError = error;
+        }
+        setTimeout(waitForRender, 100);
+      };
+      await waitForRender();
     });
   }
   win.loadURL("ardia://app/index.html").catch((error) => console.error("startup failed", error));
