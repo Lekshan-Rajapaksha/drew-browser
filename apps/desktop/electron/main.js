@@ -4,7 +4,7 @@ const path = require("node:path");
 
 if (require("electron-squirrel-startup")) app.quit();
 
-app.setName("72 Browser");
+app.setName("Drew");
 Menu.setApplicationMenu(null);
 
 protocol.registerSchemesAsPrivileged([{ scheme: "ardia", privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }]);
@@ -47,7 +47,7 @@ function createWindow() {
     height: 860,
     minWidth: 720,
     minHeight: 460,
-    title: "72 Browser",
+    title: "Drew",
     backgroundColor: "#18181b",
     show: process.env.ARDIA_BACKGROUND !== "1",
     titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "default",

@@ -1,9 +1,9 @@
 {
-  "name": "72-browser-desktop",
+  "name": "drew-browser-desktop",
   "version": "0.2.46",
   "private": true,
-  "description": "72 Browser – Desktop (Windows/Mac/Linux)",
-  "author": "72 Browser",
+  "description": "Drew – Desktop (Windows/Mac/Linux)",
+  "author": "Drew",
   "repository": {
     "type": "git",
     "url": "https://github.com/Lekshan-Rajapaksha/72-browser.git"
@@ -16,8 +16,8 @@
     "dist:mac": "electron-builder --mac --publish never"
   },
   "build": {
-    "appId": "com.ardia.browser",
-    "productName": "72 Browser",
+    "appId": "com.drew.browser",
+    "productName": "Drew",
     "directories": {
       "output": "dist"
     },

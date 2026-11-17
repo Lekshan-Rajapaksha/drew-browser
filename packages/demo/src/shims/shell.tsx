@@ -22,7 +22,7 @@ export { MouseArea } from "./web/MouseArea";
 export { showMenu } from "./web/menus";
 
 const SYSTEM_INFO: SystemInfo = {
-  appName: "72 Browser",
+  appName: "Drew",
   appVersion: "demo",
   appBuild: "web",
   bundleId: "dev.ardia.demo",
