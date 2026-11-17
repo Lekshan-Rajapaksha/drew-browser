@@ -1,7 +1,6 @@
 const { app, BrowserWindow, shell } = require("electron");
 const path = require("node:path");
 
-// Handle Squirrel events on Windows (installer/uninstaller)
 if (require("electron-squirrel-startup")) app.quit();
 
 function createWindow() {
@@ -18,20 +17,17 @@ function createWindow() {
       contextIsolation: true,
       sandbox: true,
     },
-    // Use app icon
     ...(process.platform === "win32" && {
-      icon: path.join(__dirname, "../assets/icon.ico"),
+      icon: path.join(__dirname, "../assets/icon.png"),
     }),
     ...(process.platform === "darwin" && {
       icon: path.join(__dirname, "../assets/icon.icns"),
     }),
   });
 
-  // Load the built web app (bundled inside the app)
   const indexPath = path.join(__dirname, "../web/index.html");
   win.loadFile(indexPath);
 
-  // Open external links in the system browser, not in Electron
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: "deny" };

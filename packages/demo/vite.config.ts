@@ -84,6 +84,7 @@ function lazyComponents(): Plugin {
 const analyze = !!process.env.ARDIA_DEMO_ANALYZE;
 
 export default defineConfig({
+  base: "./",
   plugins: [
     commonJsRequires(),
     lazyComponents(),
