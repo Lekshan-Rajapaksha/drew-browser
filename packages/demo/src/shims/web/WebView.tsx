@@ -7,6 +7,7 @@ import { useBrowser } from "../../../../../apps/browser/src/state/browser/store"
 import { REFUSED_PAGE_THEME } from "./RefusedPage";
 import { RefusedPage } from "./RefusedPage";
 import { createFrame, moveFrame, noteFrameSize, parkFrame, takeFrame } from "./framePool";
+import { ElectronWebView } from "./ElectronWebView";
 
 
 function readSameOrigin(frame: HTMLIFrameElement): { url: string; title: string } | null {
@@ -23,7 +24,7 @@ const isBlank = (url: string) => !url || url === "about:blank";
 
 type Page = { url: string; key: number };
 
-export const WebView = forwardRef<WebViewHandle, WebViewProps>(function WebView(props, ref) {
+const DemoWebView = forwardRef<WebViewHandle, WebViewProps>(function DemoWebView(props, ref) {
   const latest = useRef(props);
   latest.current = props;
   const [page, setPage] = useState<Page | null>(null);
@@ -165,3 +166,5 @@ export const WebView = forwardRef<WebViewHandle, WebViewProps>(function WebView(
     </View>
   );
 });
+
+export const WebView = location.protocol === "ardia:" ? ElectronWebView : DemoWebView;

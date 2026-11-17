@@ -56,10 +56,32 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
+      webviewTag: true,
     },
     ...(process.platform === "win32" && {
       icon: path.join(__dirname, "../assets/icon.png"),
     }),
+  });
+
+  win.webContents.on("will-attach-webview", (event, webPreferences, params) => {
+    delete webPreferences.preload;
+    webPreferences.nodeIntegration = false;
+    webPreferences.contextIsolation = true;
+    webPreferences.sandbox = true;
+    if (!params.partition?.startsWith("persist:drew-")) params.partition = "persist:drew-default";
+    try {
+      const url = new URL(params.src);
+      if (url.protocol !== "https:" && url.protocol !== "http:" && url.protocol !== "about:") event.preventDefault();
+    } catch {
+      event.preventDefault();
+    }
+  });
+
+  win.webContents.on("did-attach-webview", (_event, contents) => {
+    contents.setWindowOpenHandler(({ url }) => {
+      if (url.startsWith("https://") || url.startsWith("http://")) void contents.loadURL(url);
+      return { action: "deny" };
+    });
   });
 
   win.webContents.on("did-fail-load", (_event, code, description, url) => console.error("load failed", { code, description, url }));
