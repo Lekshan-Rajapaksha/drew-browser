@@ -1,5 +1,5 @@
 {
-  "name": "@ardia/desktop",
+  "name": "ardia-desktop",
   "version": "0.2.46",
   "private": true,
   "description": "Ardia Browser – Desktop (Windows/Mac/Linux)",

@@ -4,6 +4,7 @@ packages:
   - "!apps/site"
   - "!apps/dashboard"
   - "!apps/videos"
+  - "!apps/desktop"
 
 nodeLinker: hoisted
 

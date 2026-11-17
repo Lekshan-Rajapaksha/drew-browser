@@ -17,6 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ── Step 1: Build the web UI (Vite / pnpm monorepo) ──────────────────
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
@@ -26,13 +27,14 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - name: Install dependencies
+      - name: Install monorepo dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build web app (Vite)
         working-directory: packages/demo
         run: pnpm build
 
+      # ── Step 2: Copy web build into the Electron app ─────────────────────
       - name: Copy web build into Electron app
         shell: pwsh
         run: |
@@ -40,18 +42,20 @@ jobs:
           $dst = "apps/desktop/web"
           if (Test-Path $dst) { Remove-Item $dst -Recurse -Force }
           Copy-Item $src $dst -Recurse
-          Write-Host "Copied web build to $dst"
+          Write-Host "Web build copied to $dst"
 
+      # ── Step 3: Install Electron deps and package ─────────────────────────
       - name: Install Electron app dependencies
         working-directory: apps/desktop
         run: npm install
 
-      - name: Build Windows installer with electron-builder
+      - name: Build Windows installer
         working-directory: apps/desktop
         run: npm run dist:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # ── Step 4: Upload ────────────────────────────────────────────────────
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
