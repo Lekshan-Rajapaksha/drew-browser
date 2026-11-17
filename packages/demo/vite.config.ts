@@ -3,7 +3,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, normalizePath, type Plugin } from "vite";
 
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 const repo = here("../../");
@@ -21,12 +21,13 @@ const realPackages: Record<string, string> = {
 const ASSET = /\.(png|jpe?g|gif|webp|svg)$/;
 
 function commonJsRequires(): Plugin {
-  const scope = [`${repo}apps/browser/src/`, `${repo}packages/`];
+  const scope = [normalizePath(repo + "apps/browser/src/"), normalizePath(repo + "packages/")];
   return {
     name: "ardia-demo:requires",
     enforce: "pre",
     transform(code, id) {
-      if (!/\.(t|j)sx?$/.test(id) || !scope.some((dir) => id.startsWith(dir)) || !code.includes("require(")) return null;
+      const normalizedId = normalizePath(id);
+      if (!/\.(t|j)sx?$/.test(normalizedId) || !scope.some((dir) => normalizedId.startsWith(dir)) || !code.includes("require(")) return null;
       const specs: string[] = [];
       const body = code.replace(/\brequire\((["'])([^"']+)\1\)/g, (_match, _quote, spec: string) => {
         let index = specs.indexOf(spec);

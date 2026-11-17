@@ -33,6 +33,12 @@ jobs:
         working-directory: packages/demo
         run: pnpm build
 
+      - name: Verify browser-safe bundle
+        shell: pwsh
+        run: |
+          $matches = Get-ChildItem "packages/demo/dist/assets/*.js" | Select-String -Pattern "\brequire\("
+          if ($matches) { throw "Browser bundle contains CommonJS require calls" }
+
       - name: Copy web build into Electron app
         shell: pwsh
         run: |
