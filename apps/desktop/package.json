@@ -3,12 +3,17 @@
   "version": "0.2.46",
   "private": true,
   "description": "Ardia Browser – Desktop (Windows/Mac/Linux)",
+  "author": "Ardia",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lekshan-Rajapaksha/72-browser.git"
+  },
   "main": "electron/main.js",
   "scripts": {
     "dev": "electron .",
     "build": "electron-builder",
-    "dist:win": "electron-builder --win",
-    "dist:mac": "electron-builder --mac"
+    "dist:win": "electron-builder --win --publish never",
+    "dist:mac": "electron-builder --mac --publish never"
   },
   "build": {
     "appId": "com.ardia.browser",
