@@ -21,7 +21,7 @@ const SHORTCUTS: Shortcut[] = [
   s("KeyN", ["cmd", "ctrl"], "newGroupWithTabs"),
   s("KeyO", ["cmd"], "openFile"),
   s("KeyL", ["cmd"], "focusCommandBar"),
-  s("F5", ["ctrl"], "focusCommandBar"),
+  s("F5", [], "reload"),
   s("KeyW", ["cmd"], "closeTab", { reserved: true }),
   s("KeyW", ["cmd", "ctrl"], "closeTabGroup"),
   s("KeyK", ["cmd", "shift"], "closeAllTabs"),
@@ -101,10 +101,11 @@ const fallbacks: Shortcut[] = SHORTCUTS.filter((sc) => sc.reserved).map((sc) => 
   reserved: false,
 }));
 
-function modsOf(e: KeyboardEvent): Set<Mod> {
+function modsOf(e: KeyboardEvent, windowsControl: Mod = "cmd"): Set<Mod> {
   const mods = new Set<Mod>();
-  if (isMac ? e.metaKey : e.ctrlKey) mods.add("cmd");
+  if (isMac && e.metaKey) mods.add("cmd");
   if (isMac && e.ctrlKey) mods.add("ctrl");
+  if (!isMac && e.ctrlKey) mods.add(windowsControl);
   if (!isMac && e.metaKey) mods.add("ctrl");
   if (e.altKey) mods.add("alt");
   if (e.shiftKey) mods.add("shift");
@@ -119,10 +120,14 @@ const inText = () => !!(document.activeElement instanceof Element && document.ac
 const CODE_ALIASES: Record<string, string> = { NumpadEnter: "Enter", NumpadAdd: "Equal", NumpadSubtract: "Minus" };
 
 export function findShortcut(e: KeyboardEvent) {
-  const have = modsOf(e);
   const code = CODE_ALIASES[e.code] ?? e.code;
-  const matches = (sc: Shortcut) => sc.code === code && sameMods(sc.mods, have);
-  return SHORTCUTS.find(matches) ?? fallbacks.find(matches) ?? null;
+  const candidates = isMac ? [modsOf(e)] : [modsOf(e, "cmd"), modsOf(e, "ctrl")];
+  for (const have of candidates) {
+    const matches = (sc: Shortcut) => sc.code === code && sameMods(sc.mods, have);
+    const shortcut = SHORTCUTS.find(matches) ?? fallbacks.find(matches);
+    if (shortcut) return shortcut;
+  }
+  return null;
 }
 
 const switcher = { capturing: false, holding: null as Mod | null };

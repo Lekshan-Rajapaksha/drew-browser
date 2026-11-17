@@ -27,9 +27,20 @@ startNativeSync();
 
 const params = new URLSearchParams(location.search);
 const embed = params.has("embed");
-const bare = embed || params.has("bare");
+const nativeDesktop = location.protocol === "ardia:";
+const bare = embed || nativeDesktop || params.has("bare");
 
-Object.assign(globalThis, { ardiaDemo: { store: useBrowser, emitCommand } });
+Object.assign(globalThis, {
+  ardiaDemo: {
+    store: useBrowser,
+    emitCommand,
+    handleKey: (input: KeyboardEventInit & { type?: "keydown" | "keyup" }) => {
+      const event = new KeyboardEvent(input.type ?? "keydown", { ...input, bubbles: true, cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    },
+  },
+});
 
 function warmOtherProfiles() {
   const s = useBrowser.getState();
@@ -45,10 +56,10 @@ if (!embed || params.has("warm")) idle(warmOtherProfiles);
 
 function DemoWindow() {
   return (
-    <div className={embed ? "ardia-desktop embed" : bare ? "ardia-desktop" : "ardia-desktop with-controls"}>
+    <div className={embed ? "ardia-desktop embed" : nativeDesktop ? "ardia-desktop native-desktop" : bare ? "ardia-desktop" : "ardia-desktop with-controls"}>
       <div className="ardia-window">
         <WindowRoot />
-        <TrafficLights />
+        {nativeDesktop ? null : <TrafficLights />}
       </div>
       {bare ? null : <Customize />}
       <MenuHost />

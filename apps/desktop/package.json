@@ -1,9 +1,9 @@
 {
-  "name": "ardia-desktop",
+  "name": "72-browser-desktop",
   "version": "0.2.46",
   "private": true,
-  "description": "Ardia Browser – Desktop (Windows/Mac/Linux)",
-  "author": "Ardia",
+  "description": "72 Browser – Desktop (Windows/Mac/Linux)",
+  "author": "72 Browser",
   "repository": {
     "type": "git",
     "url": "https://github.com/Lekshan-Rajapaksha/72-browser.git"
@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.ardia.browser",
-    "productName": "Ardia",
+    "productName": "72 Browser",
     "directories": {
       "output": "dist"
     },

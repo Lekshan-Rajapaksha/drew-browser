@@ -13,6 +13,8 @@ const publish = (next: OpenMenu | null) => {
 };
 
 const pointer = { x: 0, y: 0 };
+const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+const commandPressed = (event: KeyboardEvent | PointerEvent) => (isMac ? event.metaKey : event.ctrlKey);
 let commandHeld = false;
 if (typeof window !== "undefined") {
   window.addEventListener(
@@ -20,11 +22,11 @@ if (typeof window !== "undefined") {
     (e) => {
       pointer.x = e.clientX;
       pointer.y = e.clientY;
-      commandHeld = e.metaKey;
+      commandHeld = commandPressed(e);
     },
     true,
   );
-  for (const type of ["keydown", "keyup"] as const) window.addEventListener(type, (e) => (commandHeld = e.metaKey), true);
+  for (const type of ["keydown", "keyup"] as const) window.addEventListener(type, (e) => (commandHeld = commandPressed(e)), true);
 }
 
 export function showMenu(items: MenuItem[]): Promise<string | null> {
@@ -38,14 +40,16 @@ const close = (id: string | null) => {
   menu?.resolve(id);
 };
 
-const KEYS: Record<string, string> = { command: "⌘", shift: "⇧", option: "⌥", control: "⌃" };
+const KEYS: Record<string, string> = isMac
+  ? { command: "⌘", shift: "⇧", option: "⌥", control: "⌃" }
+  : { command: "Ctrl+", shift: "Shift+", option: "Alt+", control: "Ctrl+" };
 
 function MenuList({ items, x, y }: { items: MenuItem[]; x: number; y: number }) {
   const [sub, setSub] = useState<{ index: number; top: number } | null>(null);
   const [command, setCommand] = useState(commandHeld);
   const dark = useBrowser((s) => s.ui.appDark);
   useEffect(() => {
-    const track = (e: KeyboardEvent | PointerEvent) => setCommand(e.metaKey);
+    const track = (e: KeyboardEvent | PointerEvent) => setCommand(commandPressed(e));
     const events = ["keydown", "keyup", "pointermove"] as const;
     for (const type of events) document.addEventListener(type, track);
     return () => {

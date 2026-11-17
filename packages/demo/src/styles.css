@@ -47,6 +47,17 @@ textarea:focus,
     0 22px 70px rgba(0, 0, 0, 0.45);
 }
 
+.ardia-desktop.native-desktop {
+  background: #1d1f24;
+}
+
+.ardia-desktop.native-desktop .ardia-window {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .ardia-desktop.with-controls {
   flex-direction: column;
   gap: 12px;

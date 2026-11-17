@@ -1,8 +1,11 @@
-const { app, BrowserWindow, protocol, shell } = require("electron");
+const { app, BrowserWindow, Menu, protocol, shell } = require("electron");
 const { readFile } = require("node:fs/promises");
 const path = require("node:path");
 
 if (require("electron-squirrel-startup")) app.quit();
+
+app.setName("72 Browser");
+Menu.setApplicationMenu(null);
 
 protocol.registerSchemesAsPrivileged([{ scheme: "ardia", privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }]);
 
@@ -44,10 +47,11 @@ function createWindow() {
     height: 860,
     minWidth: 720,
     minHeight: 460,
-    title: "Ardia",
+    title: "72 Browser",
     backgroundColor: "#18181b",
     show: process.env.ARDIA_BACKGROUND !== "1",
     titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "default",
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -88,6 +92,30 @@ function createWindow() {
     });
   }
   win.loadURL("ardia://app/index.html").catch((error) => console.error("startup failed", error));
+
+  win.setMenuBarVisibility(false);
+
+  win.webContents.on("before-input-event", (event, input) => {
+    if (process.platform !== "win32") return;
+    const editKeys = new Set(["KeyA", "KeyC", "KeyV", "KeyX", "KeyZ"]);
+    const functionKey = input.code === "F5" || input.code === "F7" || input.code === "F12";
+    const editCommand = input.control && !input.alt && !input.shift && editKeys.has(input.code);
+    const modified = input.control && !editCommand;
+    if (!modified && !functionKey) return;
+    if (input.type !== "keyDown" && input.type !== "keyUp") return;
+    event.preventDefault();
+    const keyboardEvent = {
+      type: input.type === "keyDown" ? "keydown" : "keyup",
+      key: input.key,
+      code: input.code,
+      ctrlKey: input.control,
+      altKey: input.alt,
+      shiftKey: input.shift,
+      metaKey: input.meta,
+      repeat: input.isAutoRepeat,
+    };
+    void win.webContents.executeJavaScript("globalThis.ardiaDemo?.handleKey(" + JSON.stringify(keyboardEvent) + ")");
+  });
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     const scheme = new URL(url).protocol;

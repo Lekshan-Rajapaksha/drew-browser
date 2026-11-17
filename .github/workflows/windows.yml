@@ -68,9 +68,9 @@ jobs:
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: Ardia-Windows
+          name: 72-Browser-Windows
           path: |
-            apps/desktop/dist/*.exe
+            apps/desktop/dist/*72*.exe
             apps/desktop/dist/*.zip
           if-no-files-found: error
 
@@ -79,7 +79,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            apps/desktop/dist/*.exe
+            apps/desktop/dist/*72*.exe
             apps/desktop/dist/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
