@@ -17,48 +17,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup MSVC compiler
-        uses: ilammy/msvc-dev-cmd@v1
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
-      - name: Install NSIS
-        run: choco install nsis -y
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
 
-      - name: Configure CMake
-        run: cmake -S apps/browser/windows -B apps/browser/windows/build -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Build Ardia.exe
-        run: cmake --build apps/browser/windows/build
+      - name: Build web app (Vite)
+        working-directory: packages/demo
+        run: pnpm build
 
-      - name: Verify Ardia.exe was created
+      - name: Copy web build into Electron app
         shell: pwsh
         run: |
-          $exe = "apps/browser/windows/build/Ardia.exe"
-          if (-not (Test-Path $exe)) {
-            Write-Error "Build failed: $exe not found!"
-            exit 1
-          }
-          Write-Host "Ardia.exe built successfully."
+          $src = "packages/demo/dist"
+          $dst = "apps/desktop/web"
+          if (Test-Path $dst) { Remove-Item $dst -Recurse -Force }
+          Copy-Item $src $dst -Recurse
+          Write-Host "Copied web build to $dst"
 
-      - name: Create installer with NSIS
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path dist/windows | Out-Null
-          $buildDir = (Resolve-Path "apps/browser/windows/build").Path
-          $outFile  = (Resolve-Path ".").Path + "\dist\windows\Ardia-Setup.exe"
-          $nsi      = (Resolve-Path "scripts/windows/ardia-setup.nsi").Path
-          & "C:\Program Files (x86)\NSIS\makensis.exe" `
-            "/DPRODUCT_VERSION=0.2.46" `
-            "/DBUILD_DIR=$buildDir" `
-            "/DOUT_FILE=$outFile" `
-            $nsi
+      - name: Install Electron app dependencies
+        working-directory: apps/desktop
+        run: npm install
+
+      - name: Build Windows installer with electron-builder
+        working-directory: apps/desktop
+        run: npm run dist:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: 72-Browser-Windows
+          name: Ardia-Windows
           path: |
-            dist/windows/Ardia-Setup.exe
-            apps/browser/windows/build/Ardia.exe
+            apps/desktop/dist/*.exe
+            apps/desktop/dist/*.zip
           if-no-files-found: error
 
       - name: Upload to GitHub Release
@@ -66,7 +66,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/windows/Ardia-Setup.exe
-            apps/browser/windows/build/Ardia.exe
+            apps/desktop/dist/*.exe
+            apps/desktop/dist/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
